@@ -1,0 +1,32 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: service-resume
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://wuzx.cool:30006/lagou?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 123456
+  jpa:
+    database: MySQL
+    show-sql: true
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl  #避免将驼峰命名转换为下划线命名
+
+#注册到Eureka服务中心
+eureka:
+  client:
+    service-url:
+      # 注册到集群，就把多个Eurekaserver地址使用逗号连接起来即可；注册到单实例（非集群模式），那就写一个就ok
+      defaultZone: http://localhost:8060/eureka
+  instance:
+    prefer-ip-address: true # 服务实例显示ip而不是显示主机名
+    # 实例名称
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+    # 自定义元数据
+    metadata-map:
+      cluster: wuzx
+      name: hello
+      age: 20

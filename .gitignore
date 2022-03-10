@@ -1,0 +1,5 @@
+# Project exclude paths
+/eureka-server/target/
+/service-autodeliver/target/
+/service-common/target/
+/service-resume/target/
