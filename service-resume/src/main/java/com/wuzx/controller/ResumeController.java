@@ -21,6 +21,14 @@ public class ResumeController {
 
     @GetMapping("/openstate/{userId}")
     public Integer findDefaultResumeState(@PathVariable Long userId) {
-        return resumeService.findDefaultResumeByUserId(userId).getIsOpenResume();
+//        resumeService.findDefaultResumeByUserId(userId).getIsOpenResume();
+
+
+        try {
+            Thread.sleep(10000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return port;
     }
 }

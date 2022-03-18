@@ -1,5 +1,7 @@
 package com.wuzx.controller;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -39,4 +41,61 @@ public class AutodeliverController {
 
         return restTemplate.getForObject(url, Integer.class);
     }
+
+
+    /**
+     * 通过ribbon调用
+     *
+     * @param userId
+     * @return
+     */
+    @GetMapping("/checkStateByRibbon/{userId}")
+    public Integer findResumeOpenStateRibbon(@PathVariable Long userId) {
+        String url = String.format("http://%s/resume/openstate/%s", "service-resume", userId);
+        return restTemplate.getForObject(url, Integer.class);
+    }
+
+    /**
+     * 通过ribbon调用
+     *
+     * @param userId
+     * @return
+     */
+    // 使用HystrixCommand注解进行熔断控制
+    @HystrixCommand(
+            // commandProperties进行一些熔断细节属性配置
+            commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000")
+            }
+    )
+    @GetMapping("/checkStateTimeout/{userId}")
+    public Integer findResumeOpenStateTimeout(@PathVariable Long userId) {
+
+        String url = String.format("http://%s/resume/openstate/%s", "service-resume", userId);
+        return restTemplate.getForObject(url, Integer.class);
+    }
+
+
+    @HystrixCommand(
+            // commandProperties进行一些熔断细节属性配置
+            commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000")
+            },fallbackMethod = "myFallBack"
+    )
+    @GetMapping("/checkStateTimeoutFallBack/{userId}")
+    public Integer checkStateTimeoutFallBack(@PathVariable Long userId) {
+
+        String url = String.format("http://%s/resume/openstate/%s", "service-resume", userId);
+        return restTemplate.getForObject(url, Integer.class);
+    }
+
+
+    /**
+     * 定义回退方法，方法形参和返回值与原始方法一样
+     */
+
+    public Integer myFallBack(Long id) {
+        return -1;
+    }
+
 }
