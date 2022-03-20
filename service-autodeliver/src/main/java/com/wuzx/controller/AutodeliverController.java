@@ -65,7 +65,14 @@ public class AutodeliverController {
     @HystrixCommand(
             // commandProperties进行一些熔断细节属性配置
             commandProperties = {
-                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000")
+                    @HystrixProperty(name =
+                            "metrics.rollingStats.timeInMilliseconds",value = "8000"),
+                    @HystrixProperty(name =
+                            "circuitBreaker.requestVolumeThreshold",value = "2"),
+                    @HystrixProperty(name =
+                            "circuitBreaker.errorThresholdPercentage",value = "50"),
+                    @HystrixProperty(name =
+                            "circuitBreaker.sleepWindowInMilliseconds",value = "3000")
             }
     )
     @GetMapping("/checkStateTimeout/{userId}")

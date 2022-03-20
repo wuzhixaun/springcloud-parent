@@ -1,8 +1,8 @@
 server:
-  port: 8090
+  port: 9000
 spring:
   application:
-    name: service-autodeliver
+    name: hystrix-dashboard
 
 #注册到Eureka服务中心
 eureka:
