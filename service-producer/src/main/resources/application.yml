@@ -1,0 +1,49 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: service-producer
+  zipkin:
+    base-url: http://localhost:9411 # zipkin server的请求地址
+    sender:
+      type: web  # web 客户端将踪迹日志数据通过网络请求的方式传送到服务端 # kafka/rabbit 客户端将踪迹日志数据传递到mq进行中转
+  sleuth:
+    sampler:
+      # # 采样率 1 代表100%全部采集 ，默认0.1 代表10% 的请求踪迹数据会被采
+      #集
+      ## 生产环境下，请求量非常大，没有必要所有请求的踪迹数据都采集分析，对
+      #于网络包括server端压力都是比较大的，可以配置采样率采集一定比例的请求的踪迹 数据进行分析即可
+      probability: 1
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://wuzx.cool:30006/lagou?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 123456
+  jpa:
+    database: MySQL
+    show-sql: true
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl  #避免将驼峰命名转换为下划线命名
+
+#注册到Eureka服务中心
+eureka:
+  client:
+    service-url:
+      # 注册到集群，就把多个Eurekaserver地址使用逗号连接起来即可；注册到单实例（非集群模式），那就写一个就ok
+      defaultZone: http://localhost:8060/eureka
+  instance:
+    prefer-ip-address: true # 服务实例显示ip而不是显示主机名
+    # 实例名称
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+    # 自定义元数据
+    metadata-map:
+      cluster: wuzx
+      name: hello
+      age: 20
+
+#分布式链路追踪 logging:
+logging:
+  level:
+    org.springframework.web.servlet.DispatcherServlet: debug
+    org.springframework.cloud.sleuth: debug

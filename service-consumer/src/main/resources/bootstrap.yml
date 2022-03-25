@@ -1,0 +1,83 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: service-consumer
+  profiles:
+    active: prod
+  zipkin:
+    base-url: http://localhost:9411 # zipkin server的请求地址
+    sender:
+      type: web  # web 客户端将踪迹日志数据通过网络请求的方式传送到服务端 # kafka/rabbit 客户端将踪迹日志数据传递到mq进行中转
+  sleuth:
+    sampler:
+      # # 采样率 1 代表100%全部采集 ，默认0.1 代表10% 的请求踪迹数据会被采
+      #集
+      ## 生产环境下，请求量非常大，没有必要所有请求的踪迹数据都采集分析，对
+      #于网络包括server端压力都是比较大的，可以配置采样率采集一定比例的请求的踪迹 数据进行分析即可
+      probability: 1
+#  cloud:
+#    config:
+#      name: ${spring.application.name} #配置文件名称 profile: dev #后缀名称
+#      profile: ${spring.profiles.active}
+#      discovery:
+#        service-id: config-server
+#        enabled: true
+#      label: master
+#注册到Eureka服务中心
+eureka:
+  client:
+    service-url:
+      # 注册到集群，就把多个Eurekaserver地址使用逗号连接起来即可；注册到单实例（非集群模式），那就写一个就ok
+      defaultZone: http://localhost:8060/eureka
+  instance:
+    prefer-ip-address: true # 服务实例显示ip而不是显示主机名
+    # 实例名称
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+
+
+# springboot中暴露健康检查等断点接口
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    # 暴露健康接口的细节 endpoint:
+    health:
+      show-details: always
+
+ribbon:
+  # 请求连接超时时间
+  ConnectTimeout: 2000
+  # 请求处理超时时间
+  ReadTimeout: 15000
+  # 对所有的操作都进行重试
+  OkToRetryOnAllOperations: true
+  ####根据如上配置，当访问到故障请求的时候，它会再尝试访问一次当前实例(次数 由MaxAutoRetries配置)，
+  ####如果不行，就换一个实例进行访问，如果还不行，再换一次实例访问(更换次数 由MaxAutoRetriesNextServer配置)，
+  ####如果依然不行，返回失败信息。
+  MaxAutoRetries: 0 #对当前选中实例重试次数，不包括第一次调用
+  MaxAutoRetriesNextServer: 0 #切换实例的重试次数
+  NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule #负载策略调整
+
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            ##########################################Hystrix的超时时⻓设置
+            timeoutInMilliseconds: 15000
+#分布式链路追踪 logging:
+logging:
+  level:
+    org.springframework.web.servlet.DispatcherServlet: debug
+    org.springframework.cloud.sleuth: debug
+    # Feign日志只会对日志级别为debug的做出响应
+    com.wuzx.service.ProducerFeignClient: debug

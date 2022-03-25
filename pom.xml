@@ -10,9 +10,13 @@
     <modules>
         <module>eureka-server</module>
         <module>service-common</module>
-        <module>service-resume</module>
-        <module>service-autodeliver</module>
+        <module>service-producer</module>
+        <module>service-consumer</module>
         <module>hystrix-dashboard</module>
+        <module>config-server</module>
+        <module>service-stream-producer</module>
+        <module>service-stream-consumer</module>
+        <module>zipkin-server</module>
     </modules>
 
     <!--父工程打包方式为pom-->

@@ -1,0 +1,53 @@
+server:
+  port: 9002
+
+#注册到Eureka服务中心
+eureka:
+  client:
+    service-url:
+      # 注册到集群，就把多个Eurekaserver地址使用逗号连接起来即可；注册到单实例（非集群模式），那就写一个就ok
+      defaultZone: http://localhost:8060/eureka
+  instance:
+    prefer-ip-address: true # 服务实例显示ip而不是显示主机名
+    # 实例名称
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+
+spring:
+  application:
+    name: gateway
+  zipkin:
+    base-url: http://localhost:9411 # zipkin server的请求地址
+    sender:
+      type: web  # web 客户端将踪迹日志数据通过网络请求的方式传送到服务端 # kafka/rabbit 客户端将踪迹日志数据传递到mq进行中转
+  sleuth:
+    sampler:
+      # # 采样率 1 代表100%全部采集 ，默认0.1 代表10% 的请求踪迹数据会被采
+      #集
+      ## 生产环境下，请求量非常大，没有必要所有请求的踪迹数据都采集分析，对
+      #于网络包括server端压力都是比较大的，可以配置采样率采集一定比例的请求的踪迹 数据进行分析即可
+      probability: 1
+  cloud:
+    gateway:
+      routes: # 路由可以有多个
+        - id: service-autodeliver-router # 我们自定义的路由 ID，保 持唯一
+#          uri: http://127.0.0.1:8090 # 目标服务地址 自动投递微服务 (部署多实例) 动态路由:uri配置的应该是一个服务名称，而不应该是一个具体的 服务实例的地址
+          uri: lb://service-consumer
+          # gateway网关从服务注册中心获取实例信息然后负载后路由
+          predicates:
+            - Path=/autodeliver/**
+          filters:
+            - StripPrefix=1
+        - id: service-resume-router
+#          uri: http://127.0.0.1:8080
+          uri: lb://service-producer
+          predicates:
+            - Path=/resume/**
+          filters:
+            - StripPrefix=1
+
+
+#分布式链路追踪 logging:
+logging:
+  level:
+    org.springframework.web.servlet.DispatcherServlet: debug
+    org.springframework.cloud.sleuth: debug
