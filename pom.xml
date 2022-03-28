@@ -17,6 +17,7 @@
         <module>service-stream-producer</module>
         <module>service-stream-consumer</module>
         <module>zipkin-server</module>
+        <module>oauth-server</module>
     </modules>
 
     <!--父工程打包方式为pom-->

@@ -9,50 +9,42 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>service-producer</artifactId>
+    <artifactId>oauth-server</artifactId>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.wuzx</groupId>
-            <artifactId>service-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
 
-        <!-- eureka client 客户端依赖-->
+    <dependencies>
+        <!--导入Eureka Client依赖-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-
-        <!--引入config-->
+        <!--导入spring cloud oauth2依赖-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-config-client</artifactId>
+            <artifactId>spring-cloud-starter-oauth2</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.security.oauth.boot</groupId>
+                    <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
-        <!--链路追踪-->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-sleuth</artifactId>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+            <version>2.1.11.RELEASE</version>
         </dependency>
-
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-zipkin</artifactId>
-        </dependency>
-
-
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
             <artifactId>spring-security-oauth2</artifactId>
             <version>2.3.4.RELEASE</version>
         </dependency>
+
     </dependencies>
 
 </project>
