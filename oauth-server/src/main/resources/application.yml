@@ -26,4 +26,14 @@ management:
       show-details: always
 spring:
   application:
-    name: oauth-server
+    name: oauth-serve
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://wuzx.cool:30006/springcloud?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 123456
+    druid:
+      initial-size: 10
+      min-idle: 10
+      max-active: 30
+      max-wait: 50000
